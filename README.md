@@ -83,8 +83,6 @@ heroku open
 ```
 
 
-
-
 ## Assumption(s)
 1. With regards to the inputs, values that has been passed through the API endpoints are consistent to what have been shown in the example given.
 2. As most of the questions requested fields for the households, household id has been included to better differentiate which housing unit the members belong to. 
