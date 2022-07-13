@@ -82,3 +82,12 @@ Step 15: Visit application
 heroku open
 ```
 
+
+
+
+## Assumption(s)
+1. With regards to the inputs, values that has been passed through the API endpoints are consistent to what have been shown in the example given.
+2. As most of the questions requested fields for the households, household id has been included to better differentiate which housing unit the members belong to. 
+3. With regards to question 3, all households will be listed even with households that have no one living in it. 
+4. With regards to question 4, specific household refers to the specific housing unit (household id). - NOT housing type
+5. With regards to question 5i, qualifying members who are less than 16 years old include those with who are non-student. 
