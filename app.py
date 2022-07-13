@@ -19,7 +19,12 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
-api = Api(default ='API Endpoints', default_label='')
+api = Api(
+    title= 'Government Grant Disbursement API', 
+    default ='API Endpoints', 
+    default_label='', 
+    description='A RESTful API that would help your team decide on groups of people who are eligible for various upcoming government grants. These grants are disbursed based on certain criteria - like total household income, age, occupation, etc. The API should be able to build up a list of recipients and which households qualify for it. For ease of definition, a household is defined by all the people living inside 1 physical housing unit.'
+    )
 api.init_app(app)
 
 class Household(db.Model):
