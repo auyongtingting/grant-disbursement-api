@@ -82,6 +82,61 @@ Step 15: Visit application
 heroku open
 ```
 
+## Setup remote database
+
+Step 1: Download code source 
+Download repository from GitHub and unzip. 
+
+Step 2: Installation of PostgreSQL
+Before proceeding on, please ensure that PostgreSQL has been installed on your device. If not, please download from https://www.postgresql.org/download/. 
+
+Step 3: Creation of database 
+Proceed to "database" folder and run the following command to create database.
+Before creation of database, please ensure database, user, password, host and port matches in "database.py". 
+```
+cd database
+python database.py
+```
+
+Step 3: Creation of tables
+Proceed to main directory and run the following command to create tables.
+Before creation of tables, please ensure SQLALCHEMY_DATABASE_URI matches in "app.py".
+```
+cd .. 
+python
+>>> from app import db 
+>>> db.create_all()
+>>> exit()
+```
+
+Step 5: Change the environment mode from "prod" to "dev" 
+Proceed to "app.py" file and change environment mode " ENV = 'dev' ".
+```
+ENV = 'dev' 
+```
+
+
+## Run application locally
+
+Step 1: Download code source 
+Download repository from GitHub and unzip. 
+
+Step 2: Install dependencies
+Run the following command to install dependencies.
+```
+pip install -r requirements.txt
+```
+
+Step 3: Run application
+Run the application with the following command.
+```
+flask run
+```
+
+Step 4: Explore Swagger
+```
+Enter "http://127.0.0.1:5000" into browser and you're good to go! 
+```
 
 ## Assumption(s)
 1. With regards to the inputs, values that has been passed through the API endpoints are consistent to what have been shown in the example given.
