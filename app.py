@@ -81,8 +81,6 @@ family_households_schema = Family_Household_Schema(many=True)
 
 model = api.model(
     'Housing Types',{
-        'household_id':
-            fields.Integer('Enter Housing Unit (Household ID)'),
         'housing_type':
             fields.String('Enter Housing Type (Possible options: Landed, Condominium, HDB)')})
 @api.route('/post/create_household')
@@ -95,7 +93,6 @@ class post_household(Resource):
         return {'message':'household has been created and saved into database'}
 
 model = api.model('Family Member to Household',{
-    'uuid': fields.Integer('Unique Identification Number for each Member'),
     'household_id': fields.Integer('Enter Housing Unit (Household ID)'),
     'name':fields.String('Enter Name'),
     'gender':fields.String('Enter Gender (Options: Female, Male)'),
