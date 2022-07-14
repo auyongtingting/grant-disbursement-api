@@ -10,7 +10,7 @@ import json
 
 app = Flask(__name__)
 
-ENV = 'dev'
+ENV = 'prod'
 
 if ENV =='prod': 
     app.debug=True
@@ -83,7 +83,7 @@ model = api.model(
     'Housing Types',{
         'housing_type':
             fields.String('Enter Housing Type (Possible options: Landed, Condominium, HDB)')})
-@api.route('/create-household')
+@api.route('/household/create-household')
 class post_household(Resource):
     @api.expect(model)
     def post(self):
@@ -114,7 +114,7 @@ class post_member_to_household(Resource):
         db.session.commit()
         return {'message':'family member has been added to the household in the database'}
 
-@api.route('/list-households')
+@api.route('/household/list-households')
 class get_list_households(Resource):
     def get(self): 
         household = Household.query.all() 
@@ -124,7 +124,7 @@ class get_list_households(Resource):
             householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
         return jsonify(householdJson)
 
-@api.route('/specific-household/<int:householdId>')
+@api.route('/household/specific-household/<int:householdId>')
 class get_household_id(Resource):
     def get(self, householdId):
         household = Household.query.filter_by(household_id = householdId).all() 
@@ -134,7 +134,7 @@ class get_household_id(Resource):
             householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
         return jsonify(householdJson)
 
-@api.route('/student-encouragement-bonus')
+@api.route('/grant/student-encouragement-bonus')
 class get_student_encouragement_bonus(Resource):
     def get(self):
         households_sixteen = Family_Household.query.filter(extract('year', func.age(Family_Household.dob))< 16).filter(Family_Household.occupation_type == "Student").all()
@@ -161,7 +161,7 @@ class get_student_encouragement_bonus(Resource):
             householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
 
         return jsonify(householdJson)
-@api.route('/multigeneration-scheme')
+@api.route('/grant/multigeneration-scheme')
 class get_multigeneration_scheme(Resource):
     def get(self):
 
@@ -190,7 +190,7 @@ class get_multigeneration_scheme(Resource):
 
         return jsonify(householdJson)
 
-@api.route('/elder-bonus')
+@api.route('/grant/elder-bonus')
 class get_elder_bonus(Resource):
     def get(self):
 
@@ -219,7 +219,7 @@ class get_elder_bonus(Resource):
 
         return jsonify(householdJson)
 
-@api.route('/baby-sunshine-grant')
+@api.route('/grant/baby-sunshine-grant')
 class get_baby_sunshine_grant(Resource):
     
     def get(self):
@@ -241,7 +241,7 @@ class get_baby_sunshine_grant(Resource):
             householdsJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
         return (householdsJson)
 
-@api.route('/yolo-gst-grant')
+@api.route('/grant/yolo-gst-grant')
 class get_yolo_gst_grant(Resource):
     def get(self):
 
