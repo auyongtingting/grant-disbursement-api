@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 ENV = 'prod'
 
-if ENV =='prod': 
+if ENV =='dev': 
     app.debug=True
     app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:root@localhost:5432/grant_disbursement'
 else: 
@@ -85,7 +85,8 @@ model = api.model(
             fields.String('Enter Housing Type (Possible options: Landed, Condominium, HDB)')})
 @api.route('/household/create-household')
 class post_household(Resource):
-    @api.expect(model)
+    @api.response(200, 'Success', model)
+    @api.response(500, 'Internal Server Error')
     def post(self):
         housing_type = Household(housing_type=request.json['housing_type'])
         db.session.add(housing_type)
@@ -104,7 +105,8 @@ model = api.model('Family Member to Household',{
 })
 @api.route('/add-member-to-household')
 class post_member_to_household(Resource):
-    @api.expect(model)
+    @api.response(200, 'Success')
+    @api.response(500, 'Internal Server Error')
     def post(self):
         member = Family_Household(
         household_id=request.json['household_id'], name=request.json['name'],gender=request.json['gender'],
@@ -116,6 +118,8 @@ class post_member_to_household(Resource):
 
 @api.route('/household/list-households')
 class get_list_households(Resource):
+    @api.response(200, 'Success')
+    @api.response(500, 'Internal Server Error')
     def get(self): 
         household = Household.query.all() 
         householdJson = json.loads(json.dumps(household, cls=AlchemyEncoder))
@@ -126,16 +130,25 @@ class get_list_households(Resource):
 
 @api.route('/household/specific-household/<int:householdId>')
 class get_household_id(Resource):
+    @api.response(200, 'Success')
+    @api.response(500, 'Internal Server Error')
     def get(self, householdId):
-        household = Household.query.filter_by(household_id = householdId).all() 
-        householdJson = json.loads(json.dumps(household, cls=AlchemyEncoder))
-        for index, householdItem in enumerate(householdJson):
-            foundMembers = Family_Household.query.filter_by( household_id = householdItem['household_id']).all()
-            householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
-        return jsonify(householdJson)
+        try:
+            household = Household.query.filter_by(household_id = householdId).all() 
+            householdJson = json.loads(json.dumps(household, cls=AlchemyEncoder))
+            for index, householdItem in enumerate(householdJson):
+                foundMembers = Family_Household.query.filter_by( household_id = householdItem['household_id']).all()
+                householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
+            return jsonify(householdJson)
+        except KeyError as e:
+            api.abort(500, e.__doc__, status = "Internal Server Error", statusCode = "500")
+        except Exception as e:
+            api.abort(400, e.__doc__, status = "Could not save information", statusCode = "400")
 
 @api.route('/grant/student-encouragement-bonus')
 class get_student_encouragement_bonus(Resource):
+    @api.response(200, 'Success')
+    @api.response(500, 'Internal Server Error')
     def get(self):
         households_sixteen = Family_Household.query.filter(extract('year', func.age(Family_Household.dob))< 16).filter(Family_Household.occupation_type == "Student").all()
         households_sixteenJson = json.loads(json.dumps(households_sixteen, cls=AlchemyEncoder))
@@ -146,10 +159,9 @@ class get_student_encouragement_bonus(Resource):
                 qualified_sixteens.append(count_household['household_id'])
 
         households_income_200000 = Family_Household.query.with_entities(Family_Household.household_id, func.sum(Family_Household.annual_income)).filter(Family_Household.household_id.in_(qualified_sixteens)).group_by(Family_Household.household_id).having(func.sum(Family_Household.annual_income) < 200000).all()
-        households_income_200000Json = json.loads(json.dumps(households_income_200000, cls=AlchemyEncoder))
 
         qualified_households = [] 
-        for count_household in households_income_200000Json: 
+        for count_household in households_income_200000: 
             if count_household[0] not in qualified_households:
                 qualified_households.append(count_household[0])
 
@@ -161,8 +173,11 @@ class get_student_encouragement_bonus(Resource):
             householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
 
         return jsonify(householdJson)
+
 @api.route('/grant/multigeneration-scheme')
 class get_multigeneration_scheme(Resource):
+    @api.response(200, 'Success')
+    @api.response(500, 'Internal Server Error')
     def get(self):
 
         households_income_150000 = Family_Household.query.with_entities(Family_Household.household_id, func.sum(Family_Household.annual_income)).group_by(Family_Household.household_id).having(func.sum(Family_Household.annual_income) < 150000).all()
@@ -192,6 +207,8 @@ class get_multigeneration_scheme(Resource):
 
 @api.route('/grant/elder-bonus')
 class get_elder_bonus(Resource):
+    @api.response(200, 'Success')
+    @api.response(500, 'Internal Server Error')
     def get(self):
 
         hdb_households = Household.query.filter(Household.housing_type == "HDB").all() 
@@ -221,7 +238,8 @@ class get_elder_bonus(Resource):
 
 @api.route('/grant/baby-sunshine-grant')
 class get_baby_sunshine_grant(Resource):
-    
+    @api.response(200, 'Success')
+    @api.response(500, 'Internal Server Error')
     def get(self):
         today = datetime.date.today()
         filter_date = today - relativedelta(months=+8)
@@ -239,12 +257,14 @@ class get_baby_sunshine_grant(Resource):
         for index, householdItem in enumerate(householdsJson):
             foundMembers = Family_Household.query.filter(and_(Family_Household.household_id == householdItem['household_id'],(Family_Household.dob) > filter_date)).all()
             householdsJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
-        return (householdsJson)
+        
+        return jsonify(householdsJson)
 
 @api.route('/grant/yolo-gst-grant')
 class get_yolo_gst_grant(Resource):
+    @api.response(200, 'Success')
+    @api.response(500, 'Internal Server Error')
     def get(self):
-
         hdb_households = Household.query.filter(Household.housing_type == "HDB").all() 
         hdb_householdsJson = json.loads(json.dumps(hdb_households, cls=AlchemyEncoder))
 
@@ -253,11 +273,10 @@ class get_yolo_gst_grant(Resource):
             if (hdb_household["household_id"] not in hdb_households):
                 hdb_households.append(hdb_household["household_id"])
         
+        hdb_households2 = Family_Household.query.with_entities(Family_Household.household_id, func.sum(Family_Household.annual_income)).filter(Family_Household.household_id.in_(hdb_households)).group_by(Family_Household.household_id).having(func.sum(Family_Household.annual_income) < 100000).all()
+                
         qualified_households = [] 
-        hdb_households2 = Family_Household.query.filter(Household.household_id.in_(hdb_households)).with_entities(Family_Household.household_id, func.sum(Family_Household.annual_income)).group_by(Family_Household.household_id).having(func.sum(Family_Household.annual_income) < 100000).all()
-        hdb_households2Json = json.loads(json.dumps(hdb_households2, cls=AlchemyEncoder))
-        
-        for hdb_household2 in hdb_households2Json:
+        for hdb_household2 in hdb_households2:
             if (hdb_household2[0] not in qualified_households):
                 qualified_households.append(hdb_household2[0])
 
@@ -268,4 +287,4 @@ class get_yolo_gst_grant(Resource):
             foundMembers = Family_Household.query.filter(Family_Household.household_id == householdItem['household_id']).all()
             householdsJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
 
-        return (householdsJson)
+        return jsonify(householdsJson)
