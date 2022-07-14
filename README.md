@@ -115,7 +115,7 @@ Proceed to "app.py" file and change environment mode " ENV = 'dev' ".
 ENV = 'dev' 
 ```
 
-Step 6: Import csv files to test endpoints (For testing purposes only - not included in heroku)
+Step 6: Import csv files to test endpoints (For testing purposes)
 Proceed to pgAdmin 4 and locate database named 'grant_disbursement'. Subsequently, proceed to the respective tables to upload csv files found in data folder. Do remember to check option for headers. 
 
 ## Run application locally
