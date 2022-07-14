@@ -10,9 +10,9 @@ import json
 
 app = Flask(__name__)
 
-ENV = 'prod'
+ENV = 'dev'
 
-if ENV =='dev': 
+if ENV =='prod': 
     app.debug=True
     app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:root@localhost:5432/grant_disbursement'
 else: 
@@ -83,7 +83,7 @@ model = api.model(
     'Housing Types',{
         'housing_type':
             fields.String('Enter Housing Type (Possible options: Landed, Condominium, HDB)')})
-@api.route('/post/create_household')
+@api.route('/create-household')
 class post_household(Resource):
     @api.expect(model)
     def post(self):
@@ -102,7 +102,7 @@ model = api.model('Family Member to Household',{
     'annual_income':fields.Integer('Enter Annual Income'),
     'dob': fields.String('Enter DOB (YYYY-MM-DD)'),
 })
-@api.route('/post/add_member_to_household')
+@api.route('/add-member-to-household')
 class post_member_to_household(Resource):
     @api.expect(model)
     def post(self):
@@ -114,7 +114,7 @@ class post_member_to_household(Resource):
         db.session.commit()
         return {'message':'family member has been added to the household in the database'}
 
-@api.route('/get/list_households')
+@api.route('/list-households')
 class get_list_households(Resource):
     def get(self): 
         household = Household.query.all() 
@@ -124,17 +124,17 @@ class get_list_households(Resource):
             householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
         return jsonify(householdJson)
 
-@api.route('/get/specific_household/<int:household_id>')
+@api.route('/specific-household/<int:householdId>')
 class get_household_id(Resource):
-    def get(self, household_id):
-        household = Household.query.filter_by(household_id = household_id).all() 
+    def get(self, householdId):
+        household = Household.query.filter_by(household_id = householdId).all() 
         householdJson = json.loads(json.dumps(household, cls=AlchemyEncoder))
         for index, householdItem in enumerate(householdJson):
             foundMembers = Family_Household.query.filter_by( household_id = householdItem['household_id']).all()
             householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
         return jsonify(householdJson)
 
-@api.route('/get/student_encouragement_bonus')
+@api.route('/student-encouragement-bonus')
 class get_student_encouragement_bonus(Resource):
     def get(self):
         households_sixteen = Family_Household.query.filter(extract('year', func.age(Family_Household.dob))< 16).filter(Family_Household.occupation_type == "Student").all()
@@ -161,7 +161,7 @@ class get_student_encouragement_bonus(Resource):
             householdJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
 
         return jsonify(householdJson)
-@api.route('/get/multigeneration_scheme')
+@api.route('/multigeneration-scheme')
 class get_multigeneration_scheme(Resource):
     def get(self):
 
@@ -190,7 +190,7 @@ class get_multigeneration_scheme(Resource):
 
         return jsonify(householdJson)
 
-@api.route('/get/elder_bonus')
+@api.route('/elder-bonus')
 class get_elder_bonus(Resource):
     def get(self):
 
@@ -219,7 +219,7 @@ class get_elder_bonus(Resource):
 
         return jsonify(householdJson)
 
-@api.route('/get/baby_sunshine_grant')
+@api.route('/baby-sunshine-grant')
 class get_baby_sunshine_grant(Resource):
     
     def get(self):
@@ -241,7 +241,7 @@ class get_baby_sunshine_grant(Resource):
             householdsJson[index]['members'] = json.loads(json.dumps(foundMembers, cls=AlchemyEncoder))
         return (householdsJson)
 
-@api.route('/get/yolo_gst_grant')
+@api.route('/yolo-gst-grant')
 class get_yolo_gst_grant(Resource):
     def get(self):
 
