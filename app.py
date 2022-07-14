@@ -73,7 +73,7 @@ class Family_Household(db.Model):
     marital_status = db.Column(db.String)
     spouse = db.Column(db.String, nullable=True)
     occupation_type = db.Column(db.String)
-    annual_income = db.Column(db.Integer)
+    annual_income = db.Column(db.Integer, nullable=True)
     dob = db.Column(db.Date)
     household = db.relationship('Household', backref='members')
 
